@@ -1,6 +1,6 @@
 var render,scene,camera;
 var boxes=[];
-var plaer;
+var player;
 window.onload=function(){
 	scene=new THREE.Scene();
 	camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
@@ -11,7 +11,8 @@ window.onload=function(){
 	render.setClearColor(0x000000);
 	render.setSize(window.innerWidth,window.innerHeight);
 	document.body.appendChild(render.domElement);
-
+	$("body").keypress(keyPress);
+	
 
 	player=new Player(scene,0,1,0);
 
@@ -34,6 +35,7 @@ function renderer(){
 	for (var i = 0; i < boxes.length; i++) {
 		boxes[i].update(scene);
 	}
+	player.update();
 	render.render(scene,camera);
 }
 
@@ -47,6 +49,20 @@ function createGround(s){
 	plane.position.y=0;
 	plane.position.z=-25;
 	s.add(plane);
+}
+
+function keyPress(e){
+	var key= e.keyCode;
+	console.log(key);
+	switch(key){
+		case 97:
+		player.move(1);
+		break;
+
+		case 100:
+		player.move(2);
+		break;
+	}
 }
 
 ///Block object
@@ -83,6 +99,10 @@ function Player(scene,x,y,z) {
 	this.x=x;
 	this.y=y;
 	this.z=z;
+	this.dx=0;
+	this.dy=0;
+	this.dz=0;
+	this.dir=0;
 	this.geometry;
 	this.material;
 	this.mesh;
@@ -96,4 +116,36 @@ Player.prototype.init = function (scene) {
 	this.mesh.position.y=this.y;
 	this.mesh.position.z=this.z;
 	scene.add(this.mesh);
+};
+Player.prototype.update = function(first_argument) {
+	this.mesh.position.x=this.x;
+	this.mesh.position.y=this.y;
+	this.mesh.position.z=this.z;
+
+	this.x+=this.dx;
+	this.y+=this.dy;
+	this.z+=this.dz;
+	
+	switch(this.dir){
+		case 0:
+		this.dx=0;
+		this.dy=0;
+		this.dz=0;
+		break;
+		case 1:
+		this.dx=-0.02;
+		this.dy=0;
+		this.dz=0;
+		break;
+		case 2:
+		this.dx=0.02;
+		this.dy=0;
+		this.dz=0;
+		break;
+	}
+
+	this.move(0);
+};
+Player.prototype.move = function(dir) {
+	this.dir=dir;
 };
